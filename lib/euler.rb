@@ -52,14 +52,36 @@ class Euler
       primes
     end
     
-    # Returns an array containing the prime factors of a number.
+    # Returns an array of all of the factors of a number.
     def factors(number)
+      fs = [1,number]
+      (2..Math.sqrt(number).to_i).each do |i|
+        if number % i == 0
+          fs << i
+          fs << number/i unless number/i == i
+        end
+      end
+      fs.sort
+    end
+    
+    # Helper for factors. Finds the products of all combinations of n numbers in the array.
+    def combination(ary, n)
+      return ary if n == 1
+      r = []
+      (0...ary.length).each do |i|
+        r.concat(combination(ary[(i+1)...ary.length], n-1).collect {|a| a * ary[i]})
+      end
+      return r
+    end
+    
+    # Returns an array containing the prime factors of a number.
+    def prime_factors(number)
       fs = []
       f1 = factor(number)
       return [number] if f1 == 1
       f2 = number/f1
-      fs.concat(factors(f1))
-      fs.concat(factors(f2))
+      fs.concat(prime_factors(f1))
+      fs.concat(prime_factors(f2))
       return fs
     end
 
@@ -124,6 +146,65 @@ class Euler
        triples << [Math.sqrt(diff).to_i, i, hypotenuse] if Math.sqrt(diff) % 1 == 0.0
       end
       triples
+    end
+    
+    # Find the largest vertical sum in a grid.
+    def vertical_max(grid, rows, cols, length)
+      max = 0
+      # For each column
+      (0...cols).each do |x|
+        # Each entry in the column
+        ((length-1)...rows).each do |y|
+          # Multiply that entry and the length-1 entries before it and compare
+          p = ((y-length+1)..y).inject(1) {|product, i| product * grid[i][x]}
+          max = p if max < p
+        end
+      end
+      max
+    end
+    
+    # Find the largest horizontal sum in a grid.
+    def horizontal_max(grid, rows, cols, length)
+      max = 0
+      # For each column
+      (0...rows).each do |y|
+        # Each entry in the column
+        ((length-1)...cols).each do |x|
+          # Multiply that entry and the length-1 entries before it and compare
+          p = ((x-length+1)..x).inject(1) {|product, i| product * grid[y][i]}
+          max = p if max < p
+        end
+      end
+      max
+    end
+    
+    # Find the largest diagonal sum in a grid.
+    def diagonal_max(grid, rows, cols, length)
+      max = 0
+      # For each column
+      ((length-1)...rows).each do |y|
+        # Each entry in the column
+        ((length-1)...cols).each do |x|
+          # Multiply that entry and the length-1 entries before it and compare
+          p = (0...length).inject(1) {|product, i| product * grid[y-i][x-i]}
+          max = p if max < p
+        end
+      end
+      (0...(rows-length)).each do |y|
+        # Each entry in the column
+        ((length-1)...cols).each do |x|
+          # Multiply that entry and the length-1 entries before it and compare
+          p = (0...length).inject(1) {|product, i| product * grid[y+i][x-i]}
+          max = p if max < p
+        end
+      end
+      max
+    end
+    
+    # Finds the sequence where the next number in the sequence is 3n+1 for odd numbers and n/2 for evens.
+    def p14_sequence(number)
+      return [1] if number == 1
+      [number].concat(number % 2 == 0 ? p14_sequence(number/2) : p14_sequence((3*number) + 1))
     end
   end
 end
