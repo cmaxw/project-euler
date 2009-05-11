@@ -1,6 +1,27 @@
 class Euler
  
   class << self
+    def abundant_numbers(max)
+      numbers = []
+      (2..max).each do |num|
+        f = factors(num)
+        f.delete(num)
+        numbers << num if num < f.inject(0) {|m, i| m + i}
+      end
+      numbers
+    end
+    
+    def factorial(num)
+      return 1 if num == 1
+      puts num
+      num * factorial(num - 1)
+    end
+    
+    def sum_digits(num)
+      num_str = num.to_s
+      (0..num_str.length).to_a.inject(0) {|memo, i| memo + num_str[i, 1].to_i}
+    end
+    
     # Returns the nth prime number.
     def prime(n)
       return 2 if n == 1
